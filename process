@@ -1,0 +1,61 @@
+import os
+
+currentDir = os.path.dirname(os.path.abspath(__file__))
+
+def openFile(filename):        
+    path = f'{currentDir}\\{filename}'
+    return open(path)
+
+def writeFile(filename, data):    
+    path = f'{currentDir}\\{filename}'
+    with open(path, 'w', encoding='utf-8') as f:        
+        for line in data:
+            if line == data[-1]:                
+                f.write(f'{line}')
+            else:                
+                f.write(f'{line}\n')
+
+def getAccounts(f):
+    count = 0
+    line_count = 0
+    record = 1
+    accounts = []
+    policyFound = False
+
+    for line in f:   
+        line_count += 1                    
+        count += 1
+
+        if count == 63: # reached end of record
+            count = 0    
+            record += 1   
+            policyFound = False
+        else:
+            line = line.rstrip() # remove trailing whitespace (i.e.: \n)
+            if count == 1 and line != '': # account # line, do not run if at EOF
+                facility = line.rstrip()
+				line_str = 
+                line = line.split(' ')[-1]
+                accounts += [[line, line_count]]
+			
+            elif not policyFound and (count == 46 or count == 47 or count == 48): # sequence # lines
+                account_num = accounts[-1][0]
+                account_num_line = accounts[-1][1]
+                line = line[29:44].strip()
+
+                if line != '' and len(line) > 2:
+                    accounts[-1] = [record, (account_num, line), (account_num_line, line_count)]   
+                    policyFound = True
+                elif count == 48: # last line and no policy # found, store blank     
+                    line = ''               
+                    accounts[-1] = [record, (account_num, line), (account_num_line, line_count)]  
+                    
+    return accounts
+        
+def main():        
+    f = openFile('RCOACNUB04bill051919.TXT') 
+    accounts = getAccounts(f)
+    writeFile('accounts.txt', accounts)
+
+if __name__ == '__main__':
+    main()
