@@ -1,0 +1,60 @@
+Windows PowerShell
+Copyright (C) 2009 Microsoft Corporation. All rights reserved.
+
+PS C:\Users\kmarin> .\searchFile.ps1 -fileName C:\Temp\file
+You must provide a value expression on the right-hand side of the '-' operator.
+At C:\Users\kmarin\searchFile.ps1:24 char:8
++         {$_ - <<<< in 46, 47,48} {
+    + CategoryInfo          : ParserError: (:) [], ParseException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+
+PS C:\Users\kmarin> .\searchFile.ps1 -fileName C:\Temp\file
+You must provide a value expression on the right-hand side of the '-' operator.
+At C:\Users\kmarin\searchFile.ps1:24 char:8
++         {$_ - <<<< in 46, 47,48} {
+    + CategoryInfo          : ParserError: (:) [], ParseException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+
+PS C:\Users\kmarin> .\searchFile.ps1 -fileName C:\Temp\file
+You must provide a value expression on the right-hand side of the '-' operator.
+At C:\Users\kmarin\searchFile.ps1:24 char:8
++         {$_ - <<<< in 46, 47,48} {
+    + CategoryInfo          : ParserError: (:) [], ParseException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+
+PS C:\Users\kmarin> .\searchFile.ps1 -fileName C:\Temp\file
+You must provide a value expression on the right-hand side of the '-' operator.
+At C:\Users\kmarin\searchFile.ps1:24 char:8
++         {$_ - <<<< in 46, 47,48} {
+    + CategoryInfo          : ParserError: (:) [], ParseException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+
+PS C:\Users\kmarin> .\searchFile.ps1
+You must provide a value expression on the right-hand side of the '-' operator.
+At C:\Users\kmarin\searchFile.ps1:24 char:8
++         {$_ - <<<< in 46, 47,48} {
+    + CategoryInfo          : ParserError: (:) [], ParseException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+
+PS C:\Users\kmarin> .\searchFile.ps1 -fileName C:\Temp\file.TXT
+You must provide a value expression on the right-hand side of the '-' operator.
+At C:\Users\kmarin\searchFile.ps1:24 char:8
++         {$_ - <<<< in 46, 47,48} {
+    + CategoryInfo          : ParserError: (:) [], ParseException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+
+PS C:\Users\kmarin> .\searchFile.ps1 -fileName C:\file.TXT
+You must provide a value expression on the right-hand side of the '-' operator.
+At C:\Users\kmarin\searchFile.ps1:24 char:8
++         {$_ - <<<< in 46, 47,48} {
+    + CategoryInfo          : ParserError: (:) [], ParseException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+
+PS C:\Users\kmarin> .\searchFile.ps1 -fileName C:\kmarin\file.TXT
+You must provide a value expression on the right-hand side of the '-' operator.
+At C:\Users\kmarin\searchFile.ps1:24 char:8
++         {$_ - <<<< in 46, 47,48} {
+    + CategoryInfo          : ParserError: (:) [], ParseException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+
+PS C:\Users\kmarin> .\searchFile.ps1 -fileName C:\kmarin\file.TXT
