@@ -1,0 +1,453 @@
+' This script will evaluate all the required fields to submit a claim through Emdeon.
+' It will default to return 1 and will return 0 and add a note to the account if required fields are missing
+' Required fields from the Billing Segmentation Filter tab of the Married BP Workflow Visio.
+' Assumes this will be called from an Insurance Account
+'
+' Modified:
+'    11/06/2012    OSC - created
+'    03/20/2013    OSC - Modified for multi-record Emdeon export field mapping
+'    04/04/2013    OSC - Modified per issue log item 14
+'    04/11/2013    OSC - Modified to remove Group Num as required per issue log item 38
+'    06/20/2014    abarakat - adding ZZACPTPADR1 to the Missing billing elements For Office Ally Only
+'    01/24/2017    jamiller - modified script to include review of PB(HCFA) submissions as well as HB(UB04) in a more logical order
+
+Begin Declare
+	
+	zvEnc As syTabRec.HCENCOUNTER
+	zvAcct As syTabRec.HCACCOUNT
+	zvPat As syTabRec.HCPERSON
+	zvPY As syTabRec.HCPAYER
+	'zvGuar As syTabRec.HCPERSON
+	zvFacility As syTabRec.HCFACILITY
+	zvLineItem As syTabRec.HCCLAIMLINEITEM
+	
+	zvLIIdx As syIndex.HCCIENID
+	zvNoteText As Chr
+	'zvCond As syTabRec.ZZCLAIMCOND
+	zvOccur As syTabRec.HCCLAIMOCCUR
+	zvCDCode As syTabRec.HCCLAIMDIAG
+End Declare
+Begin Main
+	
+	' Set the keys
+	Set zvAcct.HCACID = HCACID
+	Set zvEnc.HCENID = zvAcct.HCACENCNTRID
+	Set zvPat.HCPNID = zvEnc.HCENPTID
+	Set zvFacility.HCFAID = zvEnc.HCENFACILITY
+	'Set zvGuar.HCPNID = zvEnc.HCENRPID
+	
+	
+	Set LBRETURN = 1
+	Set zvNoteText = ""
+	
+	' Provider Name Blank**
+	If $$BLANK(zvFacility.HCFADESC) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Provider Name, "
+	End If
+	
+	'Provider address blank
+	If $$BLANK(zvFacility.HCFAADR1) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Provider Address, "
+	End If
+	
+	'Provider city blank
+	If $$BLANK(zvFacility.HCFACITY) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Provider City, "
+	End If
+	
+	'Provider zip blank
+	If $$BLANK(zvFacility.HCFAZIP) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Provider Zip, "
+	End If
+	
+	'Provider tax ID blank
+	If $$BLANK(zvFacility.HCFATAXID) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Provider Tax ID, "
+	End If
+	
+	'Patient account number blank
+	If $$BLANK(zvEnc.HCENPTACCT) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Pt Acct #, "
+	End If
+	
+	'MRN blank
+	If $$BLANK(zvEnc.HCENMRN) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"MRN, "
+	End If
+	
+	'Admit date blank
+	If $$BLANK(zvEnc.HCENADMDTE) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Admit Date, "
+	End If
+	
+	'Discharge date blank
+	If $$BLANK(zvEnc.HCENDSCDTE) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Discharge Date, "
+	End If
+	
+	'Principal Diagnosis blank
+	If $$BLANK(zvEnc.HCENPRNDIAGCD) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Principal Diagnosis, "
+	End If
+	
+	'Attending physician NPI
+	If $$BLANK(zvEnc.ZZENATTENDPHYNPI) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Attending Physician NPI, "
+	End If
+	
+	'Attending physician name blank
+	If $$BLANK(zvEnc.HCENATTENDPHY) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Attending Physician Name, "
+	End If
+	
+	'Patient name blank
+	If $$BLANK(zvPat.HCPNFULLNM) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Patient Name, "
+	End If
+	
+	'Patient address blank
+	If $$BLANK(zvPat.HCPNADR1) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Patient Address, "
+	End If
+	
+	'Patient City blank
+	If $$BLANK(zvPat.HCPNCITY) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Patient City, "
+	End If
+	
+	'Patient State blank
+	If $$BLANK(zvPat.HCPNST) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Patient State, "
+	End If
+	
+	'Patient zip blank
+	If $$BLANK(zvPat.HCPNZIP) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Patient Zip, "
+	End If
+	
+	'Patient DOB blank
+	If $$BLANK(zvPat.HCPNDOB) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Patient DOB, "
+	End If
+	
+	'Patient gender blank
+	If $$BLANK(zvPat.HCPNGENDER) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Patient Gender, "
+	End If
+	
+	'Payer Name Blank**
+	If $$BLANK(zvAcct.HCACPAYNAME) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Payer Name, "
+	End If
+	
+	'Guarantor Address blank
+	'If $$BLANK(zvGuar.HCPNADR1) Then
+	If $$BLANK(zvAcct.HCACPAYADR1) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Payer Address, "
+	End If
+	
+	'Guarantor City Blank
+	'If $$BLANK(zvGuar.HCPNCITY) Then
+	If $$BLANK(zvAcct.HCACPAYCTY) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Payer City, "
+	End If
+	
+	'Guarantor State blank
+	'If $$BLANK(zvGuar.HCPNST) Then
+	If $$BLANK(zvAcct.HCACPAYST) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Payer State, "
+	End If
+	
+	'Guarantor Zip blank
+	'If $$BLANK(zvGuar.HCPNZIP) Then
+	If $$BLANK(zvAcct.HCACPAYZIP) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Payer Zip, "
+	End If
+	
+	'Insured ID blank
+	If $$BLANK(zvAcct.HCACINSUREDID) Then
+		Set LBRETURN = 0
+		Set zvNoteText = zvNoteText_"Insured ID, "
+	End If
+	
+	Select zvFacility.ZZFABILLTYPE
+		Case "HCFA"
+			
+			'Service Provider ID Blank
+			If $$BLANK(zvAcct.ZZACSRVPRVID) Then
+				Set LBRETURN = 0
+				Set zvNoteText = zvNoteText_"Service Provider ID, "
+			End If
+			
+			' loop through claim line item detail records for the encounter
+			Set zvLIIdx.HCCIENID = zvEnc.HCENID
+			Set zvLIIdx.HCCIID = ""
+			
+			While Not ($$BLANK($$zvLIIdx.Previous("HCCIID"))) And (LBRETURN)
+				Set zvLineItem.HCCIID = zvLIIdx.HCCIID
+				
+				'CLI Service Date blank
+				If $$BLANK(zvLineItem.HCCISERVICEDATE) Then
+					Set LBRETURN = 0
+					Set zvNoteText = zvNoteText_"Line Item Service Date, "
+				End If
+				
+				'CLI Proc Code blank
+				If $$BLANK(zvLineItem.ZZCICHRGCODE) Then
+					Set LBRETURN = 0
+					Set zvNoteText = zvNoteText_"Line Item Procedure Code, "
+				End If
+				
+				'CLI Place of Service Code blank
+				If $$BLANK(zvLineItem.HCCIPLACEOFSERV) Then
+					Set LBRETURN = 0
+					Set zvNoteText = zvNoteText_"Line Item Place of Service Code, "
+				End If
+				
+				'CLI Line Item Charge blank
+				If $$BLANK(zvLineItem.HCCILINECHARGE) Then
+					Set LBRETURN = 0
+					Set zvNoteText = zvNoteText_"Line Item Charge Amount, "
+				End If
+				
+				'CLI Line Item Unit Count blank
+				If $$BLANK(zvLineItem.HCCIUNITCOUNT) Then
+					Set LBRETURN = 0
+					Set zvNoteText = zvNoteText_"Line Item Unit Count, "
+				End If
+			End While
+			
+			'loop through dx codes and validate their length
+			Set zvCDCode.HCENID = zvEnc.HCENID
+			Set zvCDCode.HCDGID = ""
+			While Not ($$BLANK($$zvCDCode.Next())) And (LBRETURN)
+				If $$LENGTH($$TRANS(zvCDCode.HCDGCODE," .","")) > 7 Then
+					Set LBRETURN = 0
+					Set zvNoteText = zvNoteText_"DX Code, "
+				End If
+			End While
+			
+		Case "UB04"
+			' Find last claim line item detail record for the encounter
+			Set zvLIIdx.HCCIENID = zvEnc.HCENID
+			Set zvLIIdx.HCCIID = ""
+			Call zvLIIdx.Previous("HCCIID")
+			Set zvLineItem.HCCIID = zvLIIdx.HCCIID
+			
+			' Find first occurence code for the encounter
+			Set zvOccur.HCENID = zvEnc.HCENID
+			Set zvOccur.HCOCID = ""
+			Call zvOccur.Next()
+			
+			'Admit time blank
+			If $$BLANK(zvEnc.HCENADMTIME) Then
+				Set LBRETURN = 0
+				Set zvNoteText = zvNoteText_"Admit Time, "
+			End If
+			
+			'Admit type blank
+			If $$BLANK(zvEnc.HCENADMTYP) Then
+				Set LBRETURN = 0
+				Set zvNoteText = zvNoteText_"Admit Type, "
+			End If
+			
+			'Admit source blank
+			If $$BLANK(zvEnc.HCENADMSRCCD) Then
+				Set LBRETURN = 0
+				Set zvNoteText = zvNoteText_"Admit Source, "
+			End If
+			
+			'Discharge hour blank
+			If $$BLANK(zvEnc.ZZENDSCTIME) Then
+				Set LBRETURN = 0
+				Set zvNoteText = zvNoteText_"Discharge Time, "
+			End If
+			
+			'Covered Days blank on inpatient accounts
+			If zvEnc.HCENPTTYPE = "I" Then
+				If $$BLANK(zvAcct.ZZACCVRDDAYS) Then
+					Set LBRETURN = 0
+					Set zvNoteText = zvNoteText_"Covered Days, "
+				End If
+			End If
+			
+			'Patient status blank
+			'If $$BLANK(zvEnc.HCENPTSTATUSCD) Then
+			If $$BLANK(zvEnc.HCENDSCSTCD) Then
+				Set LBRETURN = 0
+				Set zvNoteText = zvNoteText_"Patient Status, "
+			End If
+			
+			'Occurence Code 1 Blank
+			'If $$BLANK(zvEnc.HCENOCCCD1) Then
+			If $$BLANK(zvOccur.HCOCCODE) Then
+				Set LBRETURN = 0
+				Set zvNoteText = zvNoteText_"Occurence Code 1, "
+			End If
+			
+			'Occurence Date 1 blank
+			'If $$BLANK(zvEnc.HCENOCCDTE1) Then
+			If $$BLANK(zvOccur.HCOCDATE) Then
+				Set LBRETURN = 0
+				Set zvNoteText = zvNoteText_"Occurence Date 1, "
+			End If
+			
+			'Revenue Code blank
+			If $$BLANK(zvLineItem.HCCIREVCODE) Then
+				Set LBRETURN = 0
+				Set zvNoteText = zvNoteText_"Revenue Code, "
+			End If
+			
+			'Date of service blank
+			If $$BLANK(zvLineItem.HCCISERVICEDATE) Then
+				Set LBRETURN = 0
+				Set zvNoteText = zvNoteText_"Line Item Service Date, "
+			End If
+			
+			'Units Blank
+			If $$BLANK(zvLineItem.HCCIUNITCOUNT) Then
+				Set LBRETURN = 0
+				Set zvNoteText = zvNoteText_"Units, "
+			End If
+			
+			'Charge Amount Blank
+			If $$BLANK(zvLineItem.HCCILINECHARGE) Then
+				Set LBRETURN = 0
+				Set zvNoteText = zvNoteText_"Charge Amount, "
+			End If
+			
+			'Bill Type (patient type) blank**
+			If $$BLANK(zvAcct.HCACBILLTYPE) Then
+				Set LBRETURN = 0
+				Set zvNoteText = zvNoteText_"Bill Type, "
+			End If
+			
+			'Attending physician license
+			If $$BLANK(zvEnc.HCENATTDOCID) Then
+				Set LBRETURN = 0
+				Set zvNoteText = zvNoteText_"Attending Physician License, "
+			End If
+			
+			'Insured Name Blank
+			If $$BLANK(zvAcct.HCACINSURED) Then
+				Set LBRETURN = 0
+				Set zvNoteText = zvNoteText_"Insured Name, "
+			End If
+			
+			'Insured Relation to Patient Blank
+			If $$BLANK(zvAcct.HCACIRELPT) Then
+				Set LBRETURN = 0
+				Set zvNoteText = zvNoteText_"Insured Relation to Patient, "
+			End If
+			
+			If (zvAcct.ZZACCLRHSE = "OAL") Then
+				'Pay to Address
+				If ($$BLANK(zvAcct.ZZACPTPADR1))  Then
+					Set LBRETURN = 0
+					Set zvNoteText = zvNoteText_"Pay to Address, "
+				End If
+				
+				'Pay to City
+				If ($$BLANK(zvAcct.ZZACPTPCITY))  Then
+					Set LBRETURN = 0
+					Set zvNoteText = zvNoteText_"Pay to City, "
+				End If
+				
+				'Pay to State
+				If ($$BLANK(zvAcct.ZZACPTPST))  Then
+					Set LBRETURN = 0
+					Set zvNoteText = zvNoteText_"Pay to State, "
+				End If
+				
+				'Pay to Address
+				If ($$BLANK(zvAcct.ZZACPTPZIP))  Then
+					Set LBRETURN = 0
+					Set zvNoteText = zvNoteText_"Pay to Zip Code, "
+				End If
+			End If
+			
+		Case Else
+			'do nothing as this is not a billing project
+			
+	End Select
+	
+	'Add note if we found any missing fields
+	If Not LBRETURN Then
+		Set zvNoteText = "Missing the following required fields to submit claim to Emdeon Or Office Ally: "_$$EXTRACT(zvNoteText,1,$$LENGTH(zvNoteText)-2)
+		Call zvAcct.AddNote(zvNoteText)
+	Else
+		
+		Set zvPY.HCPYID = zvAcct.HCACPAYERID
+		Set zvAcct.ZZACCLRHSE = zvPY.ZZPYCLRHSE
+		Call zvAcct.Write()
+		Set zvNoteText = "ELIG CONFIRMED Clearing House:"_zvPY.ZZPYCLRHSE
+		Call zvAcct.AddNote(zvNoteText)
+	End If
+End Main
+
+'Comments
+' Find first condition code for the encounter
+'    Set zvCond.HCENID = zvEnc.HCENID
+'    Set zvCond.ZZCCDID = ""
+'    Call zvCond.Next()
+
+'Condition Code 1 blank ---Removed check per Erika 4/4
+'If $$BLANK(zvEnc.ZZENCONDCODE1) Then
+'If $$BLANK(zvCond.ZZCCDCODE) Then
+'    Set LBRETURN = 0
+'    Set zvNoteText = zvNoteText_"Condition Code 1, "
+'End If
+
+'Charge Code blank ' Commented out per Erika 03/20/13
+'    If $$BLANK(zvLineItem.ZZCICHRGCODE) Then
+'        Set LBRETURN = 0
+'        Set zvNoteText = zvNoteText_"Charge Code, "
+'    End If
+
+'Provider Number blank** 'Commented out per Erika 3/20/2013
+'If $$BLANK(zvFacility.HCFASRVPRVID) Then
+'    Set LBRETURN = 0
+'    Set zvNoteText = zvNoteText_"Provider Number, "
+'End If
+
+'Provider NPI blank** 'Commented out per Erika 3/20/2013
+'    If $$BLANK(zvFacility.HCFASRVPRVID) Then
+'        Set LBRETURN = 0
+'        Set zvNoteText = zvNoteText_"Provider NPI, "
+'    End If
+
+'Group Name blank 'Commented out per Erika 3/20/2013
+'    If $$BLANK(zvAcct.HCACGRPNAME) Then
+'        Set LBRETURN = 0
+'        Set zvNoteText = zvNoteText_"Group Name, "
+'    End If
+
+'Group number blank 'Commented out per Erika 4/11/2013
+'If $$BLANK(zvAcct.HCACGRPNUM) Then
+'    Set LBRETURN = 0
+'    Set zvNoteText = zvNoteText_"Group Number, "
+'End If
