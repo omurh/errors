@@ -1,0 +1,192 @@
+SELECT  CASE
+when HCENFACILITY not in('HDHBILLING','MLKBILLING','RLABILLING','RLABILLINGIP','RLAHMSBILLING','HARBORBILLING','HARBORBILLINGIP','HARBORHMSBILLING') then 'All Facilities CHC'
+else HCENFACILITY end as HCENFACILITY, HCENPTACCT, HCENBAL, 
+HCACCODE,    case 
+ when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end),   cast(getdate() as date))) >365  then 'D366'
+ when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end),   cast(getdate() as date))) >=151  then 'D151_365'
+  when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end),  cast(getdate() as date))) >=91  then 'D91_150'
+    when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end),  cast(getdate() as date))) >=61  then 'D61_90'
+
+      when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end),  cast(getdate() as date))) >=31  then 'D31_60' 
+   when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end),    cast(getdate() as date))) >=22  then 'D22_30'      
+    when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end), cast(getdate() as date))) >=15  then 'D15_21' 
+       when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end), cast(getdate() as date))) >=8 then 'D8_14' 
+                when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end), cast(getdate() as date))) >=0 then 'D0_7'                
+              else 'error'  end as Days_criteria,
+ dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end),   cast(getdate() as date)) as rptday ,
+'1' as flg          
+FROM HCENCOUNTER, HCACCOUNT, HCPERSON, HCFACILITY WHERE HCENFACILITY=HCFAID 
+AND HCFAPASID='LACO'     --needs to be a parameter
+AND ZZENCURPAYERID = HCACID
+--and hcenid = HCACENCNTRID  and HCACSEQNUM=1
+AND HCENID = HCPNENCNTRID
+AND HCACCODE = 'NEEDVER'
+AND ZZFABILLTYPE <> 'HCFA'
+group by   CASE
+when HCENFACILITY not in('HDHBILLING','MLKBILLING','RLABILLING','RLABILLINGIP','RLAHMSBILLING','HARBORBILLING','HARBORBILLINGIP','HARBORHMSBILLING') then 'All Facilities CHC'
+else HCENFACILITY end , HCENPTACCT, HCENBAL, 
+HCACCODE,    case 
+ when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end),   cast(getdate() as date))) >365  then 'D366'
+ when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end),   cast(getdate() as date))) >=151  then 'D151_365'
+  when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end),  cast(getdate() as date))) >=91  then 'D91_150'
+    when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end),  cast(getdate() as date))) >=61  then 'D61_90'
+
+      when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end),  cast(getdate() as date))) >=31  then 'D31_60' 
+   when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end),    cast(getdate() as date))) >=22  then 'D22_30'      
+    when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end), cast(getdate() as date))) >=15  then 'D15_21' 
+       when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end), cast(getdate() as date))) >=8 then 'D8_14' 
+                when DATEDIFF(day,HCENORIGDTE,
+          dateadd(day, (case when datename(weekday, getdate()) = 'Friday' then -0
+                     when datename(weekday, getdate()) = 'Saturday' then -1
+                     when datename(weekday, getdate()) = 'Sunday' then -2
+                     when datename(weekday, getdate()) = 'Monday' then -3
+                     when datename(weekday, getdate()) = 'Tuesday' then -4
+                     when datename(weekday, getdate()) = 'Wednesday' then -5
+                     when datename(weekday, getdate()) = 'Thursday' then -6
+                end), cast(getdate() as date))) >=0 then 'D0_7'                
+              else 'error'  end         
+
+
