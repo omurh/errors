@@ -1,0 +1,47 @@
+Begin Declare
+	Shared ZVFACILITY As Chr
+	Shared ZVPASID As Chr
+	WinReturn As Chr
+	zvContinue As Number
+	Report As syReportCR
+	Pac As Chr
+	zvPac As syFindList
+	zvPas As syTabRec.HCPAS
+End Declare
+
+Begin Main
+	Set zvContinue = 1
+	Set zvPac.Title = "Select PAC"
+	Call zvPac.AddCol("Key",0)
+	Call zvPac.AddCol("PAC",25)
+	Call zvPac.AddCol("PAC Description", 40)
+	Set zvPac.Sorted = 1
+	Set zvPac.MultiSelect = 0
+	
+	Set zvPas.HCPSID = ""
+	While Not $$BLANK($$zvPas.Next())
+		Call zvPac.Add(zvPas.HCPSID,zvPas.HCPSID_"^"_zvPas.HCPSDESC)
+	End While
+	
+	Set Pac = $$zvPac.Display()
+	
+	If Not $$BLANK(Pac) Then
+	Else
+		Set zvContinue = 0
+	End If
+	
+	If zvContinue = 1 Then
+		Gosub CreateReport
+	Else
+		Call MSGBOX("No entry given. Report cancelled.")
+	End If
+End Main
+
+Begin Sub CreateReport
+	Set Report.ExternalFile = "ZZRPTWEEKLYUNBILLED"
+	Set Report.Title = "Weekly Unbilled Report"
+	Set Report.Zoom = 50
+	Call Report.AddParm("STRING","")
+	Call Report.AddParm("STRING",Pac)
+	Call Report.Display(0)
+End Sub CreateReport
